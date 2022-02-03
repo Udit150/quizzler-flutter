@@ -1,9 +1,5 @@
-import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
-import 'quizBrain.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
-
-QuizBrain quizBrain = QuizBrain();
+import '../Questions.dart';
 
 void main() => runApp(Quizzler());
 
@@ -30,41 +26,20 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
+  // Questions questionBank = Questions(
+  //     q: "You can lead a cow down stairs but not up stairs.", a: true); //For Single Question
+
+  List<Questions> questionBank = [
+    Questions(q: "You can lead a cow down stairs but not up stairs.", a: false),
+    Questions(
+        q: "Approximately one quarter of human bones are in the feet.",
+        a: true),
+    Questions(q: "A slug\'s blood is green.", a: true),
+    Questions(q: "Your Name is उदित", a: true)
+  ];
+
   List<Widget> scoreKeeper = [];
-
-  void checkAnswer(bool userAnswer) {
-    bool correctAnswer = quizBrain.getQuestionAnswer();
-
-    setState(() {
-      if (quizBrain.isFinished()) {
-        CoolAlert.show(
-          context: context,
-          type: CoolAlertType.confirm,
-          text: "Do you want to start over?",
-        );
-        quizBrain.reset();
-
-        scoreKeeper = [];
-      } else {
-        if (correctAnswer == true) {
-          scoreKeeper.add(
-            Icon(
-              Icons.check,
-              color: Colors.green,
-            ),
-          );
-        } else {
-          scoreKeeper.add(
-            Icon(
-              Icons.close,
-              color: Colors.red,
-            ),
-          );
-        }
-        quizBrain.nextQuestion();
-      }
-    });
-  }
+  int questionNum = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +53,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                quizBrain.getQuestionText(),
+                questionBank[questionNum].questionText,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25.0,
@@ -103,7 +78,35 @@ class _QuizPageState extends State<QuizPage> {
                   ),
                 ),
                 onPressed: () {
-                  checkAnswer(true);
+                  bool correctAnswer = questionBank[questionNum].questionAnswer;
+                  if (correctAnswer == true) {
+                    print("YES");
+                  } else {
+                    print("NO");
+                  }
+                  setState(() {
+                    if (correctAnswer == true) {
+                      print("YES");
+                      scoreKeeper.add(
+                        Icon(
+                          Icons.check,
+                          color: Colors.green,
+                        ),
+                      );
+                    } else {
+                      print("NO");
+                      scoreKeeper.add(
+                        Icon(Icons.close, color: Colors.red),
+                      );
+                    }
+                    questionNum = questionNum + 1;
+
+                    // if (questionNum < 3) {
+                    //   questionNum = questionNum + 1;
+                    // } else {
+                    //   print("OK");
+                    // }
+                  });
                 }),
           ),
         ),
@@ -114,6 +117,7 @@ class _QuizPageState extends State<QuizPage> {
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(Colors.red),
               ),
+              // color: Colors.red,
               child: Text(
                 'False',
                 style: TextStyle(
@@ -122,7 +126,7 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                checkAnswer(false);
+                //The user picked false.
               },
             ),
           ),
